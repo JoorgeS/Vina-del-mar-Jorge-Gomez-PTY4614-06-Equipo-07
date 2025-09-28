@@ -18,8 +18,10 @@ CREATE SCHEMA IF NOT EXISTS `coreVota` DEFAULT CHARACTER SET utf8 ;
 USE `coreVota` ;
 
 -- -----------------------------------------------------
--- Table `coreVota`.`t_comision`
+-- CREATE TABLES IN THE CORRECT ORDER
 -- -----------------------------------------------------
+
+-- Tablas que no tienen dependencias de otras tablas
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_comision` (
   `idComision` INT NOT NULL AUTO_INCREMENT,
   `nombreComision` VARCHAR(245) NOT NULL,
@@ -27,90 +29,6 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_comision` (
   PRIMARY KEY (`idComision`))
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_provincia`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_provincia` (
-  `idProvincia` INT NOT NULL,
-  `nombreProvincia` VARCHAR(45) NULL,
-  `t_region_idRegion` INT NOT NULL,
-  PRIMARY KEY (`idProvincia`),
-  INDEX `fk_t_provincia_t_region1_idx` (`t_region_idRegion` ASC) ,
-  CONSTRAINT `fk_t_provincia_t_region1`
-    FOREIGN KEY (`t_region_idRegion`)
-    REFERENCES `coreVota`.`t_region` (`idRegion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_partido`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_partido` (
-  `idPartido` INT NOT NULL,
-  `nombrePartido` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idPartido`, `nombrePartido`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_perfil`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_perfil` (
-  `idPerfil` INT NOT NULL,
-  `descPerfil` VARCHAR(45) NOT NULL,
-  `t_usuario_idUsuario` INT NOT NULL,
-  PRIMARY KEY (`idPerfil`),
-  INDEX `fk_t_perfil_t_usuario1_idx` (`t_usuario_idUsuario` ASC) ,
-  CONSTRAINT `fk_t_perfil_t_usuario1`
-    FOREIGN KEY (`t_usuario_idUsuario`)
-    REFERENCES `coreVota`.`t_usuario` (`idUsuario`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_usuario`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_usuario` (
-  `idUsuario` INT NOT NULL,
-  `pNombre` VARCHAR(45) NOT NULL,
-  `sNombre` VARCHAR(45) NULL,
-  `aPaterno` VARCHAR(45) NOT NULL,
-  `aMaterno` VARCHAR(45) NOT NULL,
-  `t_comuna_idComuna` INT NOT NULL,
-  `t_tipoUsuario_idTipoUsuario` INT NOT NULL,
-  `correo` VARCHAR(45) NULL,
-  `t_partido_idPartido` INT NOT NULL,
-  `t_partido_nombrePartido` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idUsuario`, `t_partido_idPartido`, `t_partido_nombrePartido`),
-  INDEX `fk_t_usuario_t_comuna1_idx` (`t_comuna_idComuna` ASC) ,
-  INDEX `fk_t_usuario_t_tipoUsuario1_idx` (`t_tipoUsuario_idTipoUsuario` ASC) ,
-  INDEX `fk_t_usuario_t_partido1_idx` (`t_partido_idPartido` ASC, `t_partido_nombrePartido` ASC) ,
-  CONSTRAINT `fk_t_usuario_t_comuna1`
-    FOREIGN KEY (`t_comuna_idComuna`)
-    REFERENCES `coreVota`.`t_comuna` (`idComuna`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_t_usuario_t_tipoUsuario1`
-    FOREIGN KEY (`t_tipoUsuario_idTipoUsuario`)
-    REFERENCES `coreVota`.`t_tipoUsuario` (`idTipoUsuario`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_t_usuario_t_partido1`
-    FOREIGN KEY (`t_partido_idPartido` , `t_partido_nombrePartido`)
-    REFERENCES `coreVota`.`t_partido` (`idPartido` , `nombrePartido`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_pleno`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_pleno` (
   `idPleno` INT NOT NULL,
   `numeroPleno` INT(10) NOT NULL,
@@ -119,282 +37,24 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_pleno` (
   PRIMARY KEY (`idPleno`))
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_sesion`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_sesion` (
-  `idSesion` INT NOT NULL AUTO_INCREMENT,
-  `numeroSesion` VARCHAR(45) NOT NULL,
-  `nombreSesion` VARCHAR(45) NOT NULL,
-  `tipoSesion` INT(1) NOT NULL,
-  `vigente` INT(1) NOT NULL,
-  `t_pleno_idPleno` INT NOT NULL,
-  PRIMARY KEY (`idSesion`, `t_pleno_idPleno`),
-  INDEX `fk_t_sesion_t_pleno1_idx` (`t_pleno_idPleno` ASC) ,
-  CONSTRAINT `fk_t_sesion_t_pleno1`
-    FOREIGN KEY (`t_pleno_idPleno`)
-    REFERENCES `coreVota`.`t_pleno` (`idPleno`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_minuta`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_minuta` (
-  `idMinuta` INT NOT NULL,
-  `pathArchivo` VARCHAR(45) NOT NULL,
-  `fechaFin` DATE NOT NULL,
-  `fechaIni` DATE NOT NULL,
-  `t_acuerdo_idAcuerdo` INT NOT NULL,
-  `t_propuesta_idPropuesta` INT NOT NULL,
-  `t_voto_idVoto` INT NOT NULL,
-  `t_voto_t_usuario_idUsuario` INT NOT NULL,
-  `t_voto_t_propuesta_idPropuesta` INT NOT NULL,
-  `t_voto_t_propuesta_t_acuerdo_idAcuerdo` INT NOT NULL,
-  `t_voto_t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` INT NOT NULL,
-  PRIMARY KEY (`idMinuta`, `t_acuerdo_idAcuerdo`, `t_propuesta_idPropuesta`, `t_voto_idVoto`, `t_voto_t_usuario_idUsuario`, `t_voto_t_propuesta_idPropuesta`, `t_voto_t_propuesta_t_acuerdo_idAcuerdo`, `t_voto_t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion`),
-  INDEX `fk_t_minuta_t_acuerdo1_idx` (`t_acuerdo_idAcuerdo` ASC) ,
-  INDEX `fk_t_minuta_t_propuesta1_idx` (`t_propuesta_idPropuesta` ASC) ,
-  INDEX `fk_t_minuta_t_voto1_idx` (`t_voto_idVoto` ASC, `t_voto_t_usuario_idUsuario` ASC, `t_voto_t_propuesta_idPropuesta` ASC, `t_voto_t_propuesta_t_acuerdo_idAcuerdo` ASC, `t_voto_t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` ASC) ,
-  CONSTRAINT `fk_t_minuta_t_acuerdo1`
-    FOREIGN KEY (`t_acuerdo_idAcuerdo`)
-    REFERENCES `coreVota`.`t_acuerdo` (`idAcuerdo`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_t_minuta_t_propuesta1`
-    FOREIGN KEY (`t_propuesta_idPropuesta`)
-    REFERENCES `coreVota`.`t_propuesta` (`idPropuesta`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_t_minuta_t_voto1`
-    FOREIGN KEY (`t_voto_idVoto` , `t_voto_t_usuario_idUsuario` , `t_voto_t_propuesta_idPropuesta` , `t_voto_t_propuesta_t_acuerdo_idAcuerdo` , `t_voto_t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion`)
-    REFERENCES `coreVota`.`t_voto` (`idVoto` , `t_usuario_idUsuario` , `t_propuesta_idPropuesta` , `t_propuesta_t_acuerdo_idAcuerdo` , `t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_reunion`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_reunion` (
-  `idReunion` INT NOT NULL,
-  `numeroReunion` VARCHAR(45) NOT NULL,
-  `nombreReunion` VARCHAR(45) NOT NULL,
-  `fechaInicioReunion` DATETIME NOT NULL,
-  `fechaTerminoReunion` DATETIME NOT NULL,
-  `vigente` INT(1) NOT NULL,
-  `t_acuerdo_idAcuerdo` INT NOT NULL,
-  `t_comision_idComision` INT NOT NULL,
-  `t_minuta_idMinuta` INT NOT NULL,
-  PRIMARY KEY (`idReunion`, `t_minuta_idMinuta`),
-  INDEX `fk_t_reunion_t_comision1_idx` (`t_comision_idComision` ASC) ,
-  INDEX `fk_t_reunion_t_minuta1_idx` (`t_minuta_idMinuta` ASC) ,
-  CONSTRAINT `fk_t_reunion_t_comision1`
-    FOREIGN KEY (`t_comision_idComision`)
-    REFERENCES `coreVota`.`t_comision` (`idComision`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_t_reunion_t_minuta1`
-    FOREIGN KEY (`t_minuta_idMinuta`)
-    REFERENCES `coreVota`.`t_minuta` (`idMinuta`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_mocion`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_mocion` (
-  `idMocion` INT NOT NULL AUTO_INCREMENT,
-  `numeroMocion` INT(10) NOT NULL,
-  `nombreMocion` VARCHAR(245) NOT NULL,
-  `t_reunion_idReunion` INT NOT NULL,
-  `t_sesion_idSesion` INT NOT NULL,
-  PRIMARY KEY (`idMocion`),
-  INDEX `fk_t_acuerdo_t_reunion1_idx` (`t_reunion_idReunion` ASC) ,
-  INDEX `fk_t_mocion_t_sesion1_idx` (`t_sesion_idSesion` ASC) ,
-  CONSTRAINT `fk_t_acuerdo_t_reunion1`
-    FOREIGN KEY (`t_reunion_idReunion`)
-    REFERENCES `coreVota`.`t_reunion` (`idReunion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_t_mocion_t_sesion1`
-    FOREIGN KEY (`t_sesion_idSesion`)
-    REFERENCES `coreVota`.`t_sesion` (`idSesion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_voto`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_voto` (
-  `idVoto` INT NOT NULL,
-  `opcionVoto` INT NOT NULL,
-  `descVoto` VARCHAR(45) NULL,
-  `t_usuario_idUsuario` INT NOT NULL,
-  `t_propuesta_idPropuesta` INT NOT NULL,
-  `t_propuesta_t_acuerdo_idAcuerdo` INT NOT NULL,
-  `t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` INT NOT NULL,
-  PRIMARY KEY (`idVoto`, `t_usuario_idUsuario`, `t_propuesta_idPropuesta`, `t_propuesta_t_acuerdo_idAcuerdo`, `t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion`),
-  INDEX `fk_t_voto_t_usuario1_idx` (`t_usuario_idUsuario` ASC) ,
-  INDEX `fk_t_voto_t_propuesta1_idx` (`t_propuesta_idPropuesta` ASC, `t_propuesta_t_acuerdo_idAcuerdo` ASC, `t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` ASC) ,
-  CONSTRAINT `fk_t_voto_t_usuario1`
-    FOREIGN KEY (`t_usuario_idUsuario`)
-    REFERENCES `coreVota`.`t_usuario` (`idUsuario`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_t_voto_t_propuesta1`
-    FOREIGN KEY (`t_propuesta_idPropuesta` , `t_propuesta_t_acuerdo_idAcuerdo` , `t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion`)
-    REFERENCES `coreVota`.`t_propuesta` (`idPropuesta` , `t_acuerdo_idAcuerdo` , `t_acuerdo_t_tipoReunion_idTipoReunion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_region`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_region` (
   `idRegion` INT NOT NULL,
   `nombreRegion` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idRegion`))
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_provincia`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_provincia` (
-  `idProvincia` INT NOT NULL,
-  `nombreProvincia` VARCHAR(45) NULL,
-  `t_region_idRegion` INT NOT NULL,
-  PRIMARY KEY (`idProvincia`),
-  INDEX `fk_t_provincia_t_region1_idx` (`t_region_idRegion` ASC) ,
-  CONSTRAINT `fk_t_provincia_t_region1`
-    FOREIGN KEY (`t_region_idRegion`)
-    REFERENCES `coreVota`.`t_region` (`idRegion`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_comuna`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_comuna` (
-  `idComuna` INT NOT NULL,
-  `nombreComuna` VARCHAR(45) NOT NULL,
-  `t_provincia_idProvincia` INT NOT NULL,
-  PRIMARY KEY (`idComuna`),
-  INDEX `fk_t_comuna_t_provincia1_idx` (`t_provincia_idProvincia` ASC) ,
-  CONSTRAINT `fk_t_comuna_t_provincia1`
-    FOREIGN KEY (`t_provincia_idProvincia`)
-    REFERENCES `coreVota`.`t_provincia` (`idProvincia`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_tipoUsuario`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_tipoUsuario` (
-  `idTipoUsuario` INT NOT NULL,
-  `descTipoUsuario` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idTipoUsuario`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_partido`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_partido` (
   `idPartido` INT NOT NULL,
   `nombrePartido` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`idPartido`, `nombrePartido`))
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_usuario`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_usuario` (
-  `idUsuario` INT NOT NULL,
-  `pNombre` VARCHAR(45) NOT NULL,
-  `sNombre` VARCHAR(45) NULL,
-  `aPaterno` VARCHAR(45) NOT NULL,
-  `aMaterno` VARCHAR(45) NOT NULL,
-  `t_comuna_idComuna` INT NOT NULL,
-  `t_tipoUsuario_idTipoUsuario` INT NOT NULL,
-  `correo` VARCHAR(45) NULL,
-  `t_partido_idPartido` INT NOT NULL,
-  `t_partido_nombrePartido` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idUsuario`, `t_partido_idPartido`, `t_partido_nombrePartido`),
-  INDEX `fk_t_usuario_t_comuna1_idx` (`t_comuna_idComuna` ASC) ,
-  INDEX `fk_t_usuario_t_tipoUsuario1_idx` (`t_tipoUsuario_idTipoUsuario` ASC) ,
-  INDEX `fk_t_usuario_t_partido1_idx` (`t_partido_idPartido` ASC, `t_partido_nombrePartido` ASC) ,
-  CONSTRAINT `fk_t_usuario_t_comuna1`
-    FOREIGN KEY (`t_comuna_idComuna`)
-    REFERENCES `coreVota`.`t_comuna` (`idComuna`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_t_usuario_t_tipoUsuario1`
-    FOREIGN KEY (`t_tipoUsuario_idTipoUsuario`)
-    REFERENCES `coreVota`.`t_tipoUsuario` (`idTipoUsuario`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_t_usuario_t_partido1`
-    FOREIGN KEY (`t_partido_idPartido` , `t_partido_nombrePartido`)
-    REFERENCES `coreVota`.`t_partido` (`idPartido` , `nombrePartido`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+CREATE TABLE IF NOT EXISTS `coreVota`.`t_tipoUsuario` (
+  `idTipoUsuario` INT NOT NULL,
+  `descTipoUsuario` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idTipoUsuario`))
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_perfil`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_perfil` (
-  `idPerfil` INT NOT NULL,
-  `descPerfil` VARCHAR(45) NOT NULL,
-  `t_usuario_idUsuario` INT NOT NULL,
-  PRIMARY KEY (`idPerfil`),
-  INDEX `fk_t_perfil_t_usuario1_idx` (`t_usuario_idUsuario` ASC) ,
-  CONSTRAINT `fk_t_perfil_t_usuario1`
-    FOREIGN KEY (`t_usuario_idUsuario`)
-    REFERENCES `coreVota`.`t_usuario` (`idUsuario`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_tipoReunion`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `coreVota`.`t_tipoReunion` (
-  `idTipoReunion` INT NOT NULL,
-  `descTipoReu` VARCHAR(45) NOT NULL,
-  `t_usuario_idUsuario` INT NOT NULL,
-  PRIMARY KEY (`idTipoReunion`),
-  INDEX `fk_t_tipoReunion_t_usuario1_idx` (`t_usuario_idUsuario` ASC) ,
-  CONSTRAINT `fk_t_tipoReunion_t_usuario1`
-    FOREIGN KEY (`t_usuario_idUsuario`)
-    REFERENCES `coreVota`.`t_usuario` (`idUsuario`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_tema`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_tema` (
   `idTema` INT NOT NULL,
   `objetvo` VARCHAR(500) NOT NULL,
@@ -404,17 +64,117 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_tema` (
 ENGINE = InnoDB;
 
 
--- -----------------------------------------------------
--- Table `coreVota`.`t_acuerdo`
--- -----------------------------------------------------
+-- Tablas que dependen de las anteriores
+CREATE TABLE IF NOT EXISTS `coreVota`.`t_provincia` (
+  `idProvincia` INT NOT NULL,
+  `nombreProvincia` VARCHAR(45) NULL,
+  `t_region_idRegion` INT NOT NULL,
+  PRIMARY KEY (`idProvincia`),
+  INDEX `fk_t_provincia_t_region1_idx` (`t_region_idRegion` ASC),
+  CONSTRAINT `fk_t_provincia_t_region1`
+    FOREIGN KEY (`t_region_idRegion`)
+    REFERENCES `coreVota`.`t_region` (`idRegion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `coreVota`.`t_comuna` (
+  `idComuna` INT NOT NULL,
+  `nombreComuna` VARCHAR(45) NOT NULL,
+  `t_provincia_idProvincia` INT NOT NULL,
+  PRIMARY KEY (`idComuna`),
+  INDEX `fk_t_comuna_t_provincia1_idx` (`t_provincia_idProvincia` ASC),
+  CONSTRAINT `fk_t_comuna_t_provincia1`
+    FOREIGN KEY (`t_provincia_idProvincia`)
+    REFERENCES `coreVota`.`t_provincia` (`idProvincia`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `coreVota`.`t_sesion` (
+  `idSesion` INT NOT NULL AUTO_INCREMENT,
+  `numeroSesion` VARCHAR(45) NOT NULL,
+  `nombreSesion` VARCHAR(45) NOT NULL,
+  `tipoSesion` INT(1) NOT NULL,
+  `vigente` INT(1) NOT NULL,
+  `t_pleno_idPleno` INT NOT NULL,
+  PRIMARY KEY (`idSesion`, `t_pleno_idPleno`),
+  INDEX `fk_t_sesion_t_pleno1_idx` (`t_pleno_idPleno` ASC),
+  CONSTRAINT `fk_t_sesion_t_pleno1`
+    FOREIGN KEY (`t_pleno_idPleno`)
+    REFERENCES `coreVota`.`t_pleno` (`idPleno`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `coreVota`.`t_usuario` (
+  `idUsuario` INT NOT NULL,
+  `pNombre` VARCHAR(45) NOT NULL,
+  `sNombre` VARCHAR(45) NULL,
+  `aPaterno` VARCHAR(45) NOT NULL,
+  `aMaterno` VARCHAR(45) NOT NULL,
+  `t_comuna_idComuna` INT NOT NULL,
+  `t_tipoUsuario_idTipoUsuario` INT NOT NULL,
+  `correo` VARCHAR(45) NULL,
+  `t_partido_idPartido` INT NOT NULL,
+  `t_partido_nombrePartido` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`idUsuario`, `t_partido_idPartido`, `t_partido_nombrePartido`),
+  INDEX `fk_t_usuario_t_comuna1_idx` (`t_comuna_idComuna` ASC),
+  INDEX `fk_t_usuario_t_tipoUsuario1_idx` (`t_tipoUsuario_idTipoUsuario` ASC),
+  INDEX `fk_t_usuario_t_partido1_idx` (`t_partido_idPartido` ASC, `t_partido_nombrePartido` ASC),
+  CONSTRAINT `fk_t_usuario_t_comuna1`
+    FOREIGN KEY (`t_comuna_idComuna`)
+    REFERENCES `coreVota`.`t_comuna` (`idComuna`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_t_usuario_t_tipoUsuario1`
+    FOREIGN KEY (`t_tipoUsuario_idTipoUsuario`)
+    REFERENCES `coreVota`.`t_tipoUsuario` (`idTipoUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_t_usuario_t_partido1`
+    FOREIGN KEY (`t_partido_idPartido` , `t_partido_nombrePartido`)
+    REFERENCES `coreVota`.`t_partido` (`idPartido` , `nombrePartido`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- Tablas que dependen de las anteriores
+CREATE TABLE IF NOT EXISTS `coreVota`.`t_perfil` (
+  `idPerfil` INT NOT NULL,
+  `descPerfil` VARCHAR(45) NOT NULL,
+  `t_usuario_idUsuario` INT NOT NULL,
+  PRIMARY KEY (`idPerfil`),
+  INDEX `fk_t_perfil_t_usuario1_idx` (`t_usuario_idUsuario` ASC),
+  CONSTRAINT `fk_t_perfil_t_usuario1`
+    FOREIGN KEY (`t_usuario_idUsuario`)
+    REFERENCES `coreVota`.`t_usuario` (`idUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `coreVota`.`t_tipoReunion` (
+  `idTipoReunion` INT NOT NULL,
+  `descTipoReu` VARCHAR(45) NOT NULL,
+  `t_usuario_idUsuario` INT NOT NULL,
+  PRIMARY KEY (`idTipoReunion`),
+  INDEX `fk_t_tipoReunion_t_usuario1_idx` (`t_usuario_idUsuario` ASC),
+  CONSTRAINT `fk_t_tipoReunion_t_usuario1`
+    FOREIGN KEY (`t_usuario_idUsuario`)
+    REFERENCES `coreVota`.`t_usuario` (`idUsuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_acuerdo` (
   `idAcuerdo` INT NOT NULL,
   `descAcuerdo` VARCHAR(45) NULL,
   `t_tipoReunion_idTipoReunion` INT NOT NULL,
   `t_tema_idTema` INT NOT NULL,
   PRIMARY KEY (`idAcuerdo`, `t_tipoReunion_idTipoReunion`, `t_tema_idTema`),
-  INDEX `fk_t_acuerdo_t_tipoReunion1_idx` (`t_tipoReunion_idTipoReunion` ASC) ,
-  INDEX `fk_t_acuerdo_t_tema1_idx` (`t_tema_idTema` ASC) ,
+  INDEX `fk_t_acuerdo_t_tipoReunion1_idx` (`t_tipoReunion_idTipoReunion` ASC),
+  INDEX `fk_t_acuerdo_t_tema1_idx` (`t_tema_idTema` ASC),
   CONSTRAINT `fk_t_acuerdo_t_tipoReunion1`
     FOREIGN KEY (`t_tipoReunion_idTipoReunion`)
     REFERENCES `coreVota`.`t_tipoReunion` (`idTipoReunion`)
@@ -428,16 +188,14 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_acuerdo` (
 ENGINE = InnoDB;
 
 
--- -----------------------------------------------------
--- Table `coreVota`.`t_propuesta`
--- -----------------------------------------------------
+-- Tablas que dependen de las anteriores
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_propuesta` (
   `idPropuesta` INT NOT NULL,
   `descPropuesta` VARCHAR(45) NULL,
   `t_acuerdo_idAcuerdo` INT NOT NULL,
   `t_acuerdo_t_tipoReunion_idTipoReunion` INT NOT NULL,
   PRIMARY KEY (`idPropuesta`, `t_acuerdo_idAcuerdo`, `t_acuerdo_t_tipoReunion_idTipoReunion`),
-  INDEX `fk_t_propuesta_t_acuerdo1_idx` (`t_acuerdo_idAcuerdo` ASC, `t_acuerdo_t_tipoReunion_idTipoReunion` ASC) ,
+  INDEX `fk_t_propuesta_t_acuerdo1_idx` (`t_acuerdo_idAcuerdo` ASC, `t_acuerdo_t_tipoReunion_idTipoReunion` ASC),
   CONSTRAINT `fk_t_propuesta_t_acuerdo1`
     FOREIGN KEY (`t_acuerdo_idAcuerdo` , `t_acuerdo_t_tipoReunion_idTipoReunion`)
     REFERENCES `coreVota`.`t_acuerdo` (`idAcuerdo` , `t_tipoReunion_idTipoReunion`)
@@ -445,10 +203,6 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_propuesta` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_voto`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_voto` (
   `idVoto` INT NOT NULL,
   `opcionVoto` INT NOT NULL,
@@ -458,8 +212,8 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_voto` (
   `t_propuesta_t_acuerdo_idAcuerdo` INT NOT NULL,
   `t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` INT NOT NULL,
   PRIMARY KEY (`idVoto`, `t_usuario_idUsuario`, `t_propuesta_idPropuesta`, `t_propuesta_t_acuerdo_idAcuerdo`, `t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion`),
-  INDEX `fk_t_voto_t_usuario1_idx` (`t_usuario_idUsuario` ASC) ,
-  INDEX `fk_t_voto_t_propuesta1_idx` (`t_propuesta_idPropuesta` ASC, `t_propuesta_t_acuerdo_idAcuerdo` ASC, `t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` ASC) ,
+  INDEX `fk_t_voto_t_usuario1_idx` (`t_usuario_idUsuario` ASC),
+  INDEX `fk_t_voto_t_propuesta1_idx` (`t_propuesta_idPropuesta` ASC, `t_propuesta_t_acuerdo_idAcuerdo` ASC, `t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` ASC),
   CONSTRAINT `fk_t_voto_t_usuario1`
     FOREIGN KEY (`t_usuario_idUsuario`)
     REFERENCES `coreVota`.`t_usuario` (`idUsuario`)
@@ -472,10 +226,6 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_voto` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_minuta`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_minuta` (
   `idMinuta` INT NOT NULL,
   `pathArchivo` VARCHAR(45) NOT NULL,
@@ -489,9 +239,9 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_minuta` (
   `t_voto_t_propuesta_t_acuerdo_idAcuerdo` INT NOT NULL,
   `t_voto_t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` INT NOT NULL,
   PRIMARY KEY (`idMinuta`, `t_acuerdo_idAcuerdo`, `t_propuesta_idPropuesta`, `t_voto_idVoto`, `t_voto_t_usuario_idUsuario`, `t_voto_t_propuesta_idPropuesta`, `t_voto_t_propuesta_t_acuerdo_idAcuerdo`, `t_voto_t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion`),
-  INDEX `fk_t_minuta_t_acuerdo1_idx` (`t_acuerdo_idAcuerdo` ASC) ,
-  INDEX `fk_t_minuta_t_propuesta1_idx` (`t_propuesta_idPropuesta` ASC) ,
-  INDEX `fk_t_minuta_t_voto1_idx` (`t_voto_idVoto` ASC, `t_voto_t_usuario_idUsuario` ASC, `t_voto_t_propuesta_idPropuesta` ASC, `t_voto_t_propuesta_t_acuerdo_idAcuerdo` ASC, `t_voto_t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` ASC) ,
+  INDEX `fk_t_minuta_t_acuerdo1_idx` (`t_acuerdo_idAcuerdo` ASC),
+  INDEX `fk_t_minuta_t_propuesta1_idx` (`t_propuesta_idPropuesta` ASC),
+  INDEX `fk_t_minuta_t_voto1_idx` (`t_voto_idVoto` ASC, `t_voto_t_usuario_idUsuario` ASC, `t_voto_t_propuesta_idPropuesta` ASC, `t_voto_t_propuesta_t_acuerdo_idAcuerdo` ASC, `t_voto_t_propuesta_t_acuerdo_t_tipoReunion_idTipoReunion` ASC),
   CONSTRAINT `fk_t_minuta_t_acuerdo1`
     FOREIGN KEY (`t_acuerdo_idAcuerdo`)
     REFERENCES `coreVota`.`t_acuerdo` (`idAcuerdo`)
@@ -510,15 +260,59 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_minuta` (
 ENGINE = InnoDB;
 
 
--- -----------------------------------------------------
--- Table `coreVota`.`t_adjunto`
--- -----------------------------------------------------
+-- Tablas que dependen de las anteriores
+CREATE TABLE IF NOT EXISTS `coreVota`.`t_reunion` (
+  `idReunion` INT NOT NULL,
+  `numeroReunion` VARCHAR(45) NOT NULL,
+  `nombreReunion` VARCHAR(45) NOT NULL,
+  `fechaInicioReunion` DATETIME NOT NULL,
+  `fechaTerminoReunion` DATETIME NOT NULL,
+  `vigente` INT(1) NOT NULL,
+  `t_acuerdo_idAcuerdo` INT NOT NULL,
+  `t_comision_idComision` INT NOT NULL,
+  `t_minuta_idMinuta` INT NOT NULL,
+  PRIMARY KEY (`idReunion`, `t_minuta_idMinuta`),
+  INDEX `fk_t_reunion_t_comision1_idx` (`t_comision_idComision` ASC),
+  INDEX `fk_t_reunion_t_minuta1_idx` (`t_minuta_idMinuta` ASC),
+  CONSTRAINT `fk_t_reunion_t_comision1`
+    FOREIGN KEY (`t_comision_idComision`)
+    REFERENCES `coreVota`.`t_comision` (`idComision`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_t_reunion_t_minuta1`
+    FOREIGN KEY (`t_minuta_idMinuta`)
+    REFERENCES `coreVota`.`t_minuta` (`idMinuta`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS `coreVota`.`t_mocion` (
+  `idMocion` INT NOT NULL AUTO_INCREMENT,
+  `numeroMocion` INT(10) NOT NULL,
+  `nombreMocion` VARCHAR(245) NOT NULL,
+  `t_reunion_idReunion` INT NOT NULL,
+  `t_sesion_idSesion` INT NOT NULL,
+  PRIMARY KEY (`idMocion`),
+  INDEX `fk_t_acuerdo_t_reunion1_idx` (`t_reunion_idReunion` ASC),
+  INDEX `fk_t_mocion_t_sesion1_idx` (`t_sesion_idSesion` ASC),
+  CONSTRAINT `fk_t_acuerdo_t_reunion1`
+    FOREIGN KEY (`t_reunion_idReunion`)
+    REFERENCES `coreVota`.`t_reunion` (`idReunion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_t_mocion_t_sesion1`
+    FOREIGN KEY (`t_sesion_idSesion`)
+    REFERENCES `coreVota`.`t_sesion` (`idSesion`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_adjunto` (
   `idAdjunto` INT NOT NULL,
   `pathAdjunto` VARCHAR(45) NOT NULL,
   `t_minuta_idMinuta` INT NOT NULL,
   PRIMARY KEY (`idAdjunto`),
-  INDEX `fk_t_adjunto_t_minuta1_idx` (`t_minuta_idMinuta` ASC) ,
+  INDEX `fk_t_adjunto_t_minuta1_idx` (`t_minuta_idMinuta` ASC),
   CONSTRAINT `fk_t_adjunto_t_minuta1`
     FOREIGN KEY (`t_minuta_idMinuta`)
     REFERENCES `coreVota`.`t_minuta` (`idMinuta`)
@@ -526,17 +320,13 @@ CREATE TABLE IF NOT EXISTS `coreVota`.`t_adjunto` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `coreVota`.`t_asistencia`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `coreVota`.`t_asistencia` (
   `idAsistencia` INT NOT NULL,
   `t_minuta_idMinuta` INT NOT NULL,
   `t_tipoReunion_idTipoReunion` INT NOT NULL,
   PRIMARY KEY (`idAsistencia`, `t_tipoReunion_idTipoReunion`),
-  INDEX `fk_t_asistencia_t_minuta1_idx` (`t_minuta_idMinuta` ASC) ,
-  INDEX `fk_t_asistencia_t_tipoReunion1_idx` (`t_tipoReunion_idTipoReunion` ASC) ,
+  INDEX `fk_t_asistencia_t_minuta1_idx` (`t_minuta_idMinuta` ASC),
+  INDEX `fk_t_asistencia_t_tipoReunion1_idx` (`t_tipoReunion_idTipoReunion` ASC),
   CONSTRAINT `fk_t_asistencia_t_minuta1`
     FOREIGN KEY (`t_minuta_idMinuta`)
     REFERENCES `coreVota`.`t_minuta` (`idMinuta`)
